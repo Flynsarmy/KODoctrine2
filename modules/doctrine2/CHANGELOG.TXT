@@ -1,0 +1,35 @@
+1.06:
+- Added support for Kohana 3.1
+- Now works regardless of your folder structure!
+
+1.05:
+- Fixed SQL logger error when passing objects as parameters in DQL queries
+- Added boolean printing to the SQL logger's DQL parameters
+
+1.04:
+- CLI tool now grabs Kohana DB information so you don't need to set it yourself
+- Added --quiet flag to proxy generation so it won't throw an error when trying to
+  add proxies that already exist
+- Doctrine classes moved to 'vendor' folder
+- Switched 'Validate Schema' and 'Load Schema' sections around on /doctrine - you're
+  supposed to load first then validate.
+- Only auto_load files in 'models\' namespace
+- Added SQL Logging for last viewed page - saves to APPPATH.logs/SQLLog.php
+
+1.03:
+- Entities are no longer deleted before being regenerated. Generating from YAML/XML
+  simply isn't flexable enough to cope with automatically generated entity files.
+  This means you'll need to MANUALLY delete any annotations+fields you change in
+  the data fixture before regenerating due to a bug in the generator script whereby
+  existing annotations are never updated. This also means you can now safely add
+  logic to your entities - it won't be deleted each generation.
++ Auth and Session drivers added
++ PDO support added
+
+1.02:
+- Entities may now be accessed from everywhere
+- Entities are now deleted before being regenerated. This is done so that any
+  changes to your schema files will always be applied when generating entities.
+  It is present due to bugs in the generation script.
+  See /doctrine2/classes/controller/doctrine "_process_action" function for
+  more details.

@@ -1,0 +1,14 @@
+1. Download Latest copy of D2 to modules/doctrine2/classes/vendor/doctrine such that the Doctrine and LICENSE files are in the /vendor/doctrine directory
+
+2. Add module to your bootstrap file:
+Kohana::modules(array(
+	...
+	 'doctrine2'   		=> MODPATH.'doctrine2',   		// Doctrine 2 ORM
+));
+
+3. Make sure you have the following folders:
+models/fixtures/schema
+models/proxies
+models/repositories
+
+4. The application and models folders need to be writable by your web server
