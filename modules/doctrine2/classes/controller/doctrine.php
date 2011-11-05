@@ -31,15 +31,37 @@ class Controller_Doctrine extends Controller
 	 * Called by the Kohana CLI tool (which in turn was called by Doctrine CLI tool)
 	 * Returns specified DB info as a string
 	 */
-	public function action_db( $conn_name, $info_name )
+	public function action_get_db_info()
 	{
-		$dbconfs = Kohana::config('database');
+		$conn_name = $this->request->param('arg1');
 
-		if ( $info_name == 'type' )
-			exit(@$dbconfs[ $conn_name ][ $info_name ]);
+		//Kohana 3.0
+		if ( Kohana::VERSION < 3.1 )
+		{
+			$conf = Kohana::config('database');
+			$dbconf = (array)@$conf[ $conn_name ];
+		}
+		//Kohana 3.1+
 		else
-			exit(@$dbconfs[ $conn_name ]['connection'][ $info_name ]);
+		{
+			$conf = Kohana::$config->load('database');
+			$dbconf = $conf->get($conn_name, array());
+		}
+
+		exit(json_encode($dbconf));
 	}
+
+	/*
+	 * Called by the Kohana CLI tool (which in turn was called by Doctrine CLI tool)
+	 * Returns a list of Kohana modules as a \n delimited string
+	 */
+	public function action_get_modules()
+	{
+		$var = $this->request->param('arg1');
+		exit(implode("\n", Kohana::modules()));
+	}
+
+
 
 	/*
 	 * Process a requestand perform any necessary actions
@@ -59,17 +81,17 @@ class Controller_Doctrine extends Controller
 			//Generate entities, proxies and repositories
 			case 'schema':
 				$this->_exececho(
-					'Generating entities',
+					'Generating entities:',
 					$this->_cli . " orm:generate-entities --generate-annotations=1 " . APPPATH
 				);
 
 				$this->_exececho(
-					'<br/><br/>Generating proxies',
+					'<br/><br/>Generating proxies:',
 					$this->_cli . " orm:generate-proxies ".APPPATH."models/proxies --quiet"
 				);
 
 				$this->_exececho(
-					'<br/><br/>Generating repositories',
+					'<br/><br/>Generating repositories:',
 					$this->_cli . " orm:generate-repositories ".APPPATH
 				);
 				break;
@@ -77,7 +99,7 @@ class Controller_Doctrine extends Controller
 			//Show SQL for creating/updating DB
 			case 'tables-sql':
 				$this->_exececho(
-					'<br/><br/>Determining DB modifications',
+					'Determining DB modifications:',
 					$this->_cli . " orm:schema-tool:update --dump-sql"
 				);
 				break;
@@ -85,7 +107,7 @@ class Controller_Doctrine extends Controller
 			//Create/update DB
 			case 'tables':
 				$this->_exececho(
-					'<br/><br/>Creating/Updating DB',
+					'Creating/Updating DB:',
 					$this->_cli . " orm:schema-tool:update --force"
 				);
 				break;
@@ -111,10 +133,10 @@ class Controller_Doctrine extends Controller
 	private function _exececho( $title, $command )
 	{
 		echo '<strong>',$title,'</strong><br/>';
-		echo $command;
-		exec( $command, $output );
-		foreach ( $output as $line )
-			echo $line, '<br/>';
+		//echo $command . "\n";
+		ob_start();
+			passthru( $command );
+		echo nl2br(ob_get_clean()), "done.<br/>";
 	}
 
 } // End Welcome

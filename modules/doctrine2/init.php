@@ -4,6 +4,18 @@
 	 * + Add support for table prefix
 	 */
 
+	require_once __DIR__.'/classes/vendor/doctrine/Doctrine/Common/ClassLoader.php';
+
+	//http://mackstar.com/blog/2010/07/29/doctrine-2-and-why-you-should-use-it
+	$classLoader = new \Doctrine\Common\ClassLoader('Doctrine', __DIR__.'/classes/vendor/doctrine');
+	$classLoader->register();
+	//This allows Doctrine-CLI tool & YAML mapping driver
+	$classLoader = new \Doctrine\Common\ClassLoader('Symfony', __DIR__.'/classes/vendor/doctrine/Doctrine');
+	$classLoader->register();
+	//Load entities
+	$classLoader = new \Doctrine\Common\ClassLoader('models', rtrim(APPPATH, '/'));
+	$classLoader->register();
+
 	use Doctrine\ORM\EntityManager,
 		Doctrine\ORM\Configuration;
 
@@ -42,18 +54,6 @@
 
 		public function __construct()
 		{
-			//http://mackstar.com/blog/2010/07/29/doctrine-2-and-why-you-should-use-it
-			require __DIR__.'/classes/vendor/doctrine/Doctrine/Common/ClassLoader.php';
-
-			$classLoader = new \Doctrine\Common\ClassLoader('Doctrine', __DIR__.'/classes/vendor/doctrine');
-			$classLoader->register();
-			//This allows Doctrine-CLI tool & YAML mapping driver
-			$classLoader = new \Doctrine\Common\ClassLoader('Symfony', __DIR__.'/classes/vendor/doctrine/Doctrine');
-			$classLoader->register();
-			//Load entities
-			$classLoader = new \Doctrine\Common\ClassLoader('models', rtrim(APPPATH, '/'));
-			$classLoader->register();
-
 			//Set up caching method
 			$cache = $this->_application_mode == 'development'
 				? new \Doctrine\Common\Cache\ArrayCache
@@ -72,7 +72,13 @@
 			// Set up logger
 			$config->setSqlLogger( new Logger_Doctrine2 );
 
-			$dbconfs = Kohana::config('database');
+
+			//Kohana 2 to 3.1
+			if ( Kohana::VERSION < 3.2 )
+				$dbconfs = Kohana::config('database');
+			//Kohana 3.2+
+			else
+				$dbconfs = Kohana::$config->load('database');
 			foreach ( $dbconfs as $conn_name => $dbconf )
 			{
 				//PDO doesn't have hostname and database in the connection array. Extract from DSN string

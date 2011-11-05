@@ -26,19 +26,27 @@ $classLoader->register();
 $config = new \Doctrine\ORM\Configuration();
 $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache);
 //$driver = $config->newDefaultAnnotationDriver( APPPATH.'models' );
-$driver = new \Doctrine\ORM\Mapping\Driver\YamlDriver(array(APPPATH.'models/fixtures/schema'));
+$schema_paths = array(APPPATH.'models/fixtures/schema');
+foreach ( get_modules() as $module_path )
+{
+	$schema_path = $module_path . 'models/fixtures/schema';
+	if ( is_dir($schema_path) )
+		$schema_paths[] = $module_path . 'models/fixtures/schema';
+}
+$driver = new \Doctrine\ORM\Mapping\Driver\YamlDriver($schema_paths);
 $driver->setFileExtension('.yml');
 $config->setMetadataDriverImpl( $driver );
 
 $config->setProxyDir( APPPATH.'models/proxies' );
 $config->setProxyNamespace('models\proxies');
 
+$conn = json_decode(get_db_info(DB_CONN));
 $connectionOptions = array(
-    'driver' 	=> 'pdo_'.get_db_info( DB_CONN, 'type' ),
-	'dbname' 	=> get_db_info( DB_CONN, 'database' ),
-	'user' 		=> get_db_info( DB_CONN, 'username' ),
-	'password' 	=> get_db_info( DB_CONN, 'password' ),
-	'host' 		=> get_db_info( DB_CONN, 'hostname' ),
+    'driver' 	=> 'pdo_'.$conn->type,
+	'dbname' 	=> $conn->connection->database,
+	'user' 		=> $conn->connection->username,
+	'password' 	=> $conn->connection->password,
+	'host' 		=> $conn->connection->hostname,
 );
 
 $em = \Doctrine\ORM\EntityManager::create($connectionOptions, $config);
@@ -49,8 +57,14 @@ $helpers = array(
 );
 
 //Run the Kohana CLI tool to access our doctrine controller which returns DB info
-function get_db_info( $conn_name, $info_name ) {
-	exec("php ".DOCROOT."index.php --uri=doctrine/db/$conn_name/$info_name", $output);
-
-	return empty($output[0]) ? NULL : $output[0];
+function get_db_info( $conn_name ) {
+	ob_start();
+		passthru("php ".DOCROOT."index.php --uri=doctrine/get_db_info/$conn_name", $output);
+	return ob_get_clean();
+}
+//Run the Kohana CLI tool to access our doctrine controller which returns DB info
+function get_modules() {
+	ob_start();
+		passthru("php ".DOCROOT."index.php --uri=doctrine/get_modules/", $output);
+	return explode("\n", ob_get_clean());
 }

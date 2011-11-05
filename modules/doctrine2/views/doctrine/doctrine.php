@@ -1,4 +1,4 @@
-Generates entities/proxies/repositories. This will delete and recreate entity files.
+Generates entities/proxies/repositories. This will <strong>NOT</strong> delete your entity files, it will only add missing fields/methods from your schema files. A backup of your old entity will be generated with a ~ extension.
 <form action="" method="POST">
 	<input type="submit" name="schema" value="Load Schema"><br />
 </form>
