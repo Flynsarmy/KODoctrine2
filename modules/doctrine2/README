@@ -1,4 +1,4 @@
-This module adds auth, session and database drivers to your Kohana 3.0 or 3.1 installation.
+This module adds auth, session and database drivers to your Kohana 3.0-3.2 installation.
 It also provides a /doctrine controller to automatically generate your entities and database tables.
 
 See http://www.flynsarmy.com/2010/12/better-doctrine-2-module-for-kohana-3/ for more information.
@@ -13,14 +13,20 @@ Kohana::modules(array(
 ));
 
 3. Make sure you have the following folders:
-models/fixtures/schema
-models/proxies
-models/repositories
+/application/models/fixtures/schema
+/application/models/proxies
+/application/models/repositories
 
 4. The application and models folders need to be writable by your web server
 
 
 CHANGELOG:
+1.07:
+- Added support for Kohana 3.2
+- Removed debug text from /doctrine controller
+- Load schema files from /models/fixtures/schema in any module
+- Updated the /doctrine page with more information
+
 1.06:
 - Added support for Kohana 3.1
 - Now works regardless of your folder structure!
