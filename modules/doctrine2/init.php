@@ -61,7 +61,12 @@
 
 			$config = new Configuration;
 			$config->setMetadataCacheImpl( $cache );
-			$driver = $config->newDefaultAnnotationDriver( APPPATH.'doctrine/Entities' );
+
+			\Doctrine\Common\Annotations\AnnotationRegistry::registerFile(dirname(__FILE__).'/classes/vendor/doctrine/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php');
+			$reader = new \Doctrine\Common\Annotations\AnnotationReader();
+			$reader = new \Doctrine\Common\Annotations\CachedReader($reader, $cache);
+			$driver = new \Doctrine\ORM\Mapping\Driver\AnnotationDriver($reader, APPPATH.'models');
+
 			$config->setMetadataDriverImpl( $driver );
 			$config->setQueryCacheImpl( $cache );
 
