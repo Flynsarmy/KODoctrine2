@@ -1,3 +1,6 @@
+1.08:
+- Now works with and requires Doctrine 2.2
+
 1.07:
 - Added support for Kohana 3.2
 - Removed debug text from /doctrine controller
