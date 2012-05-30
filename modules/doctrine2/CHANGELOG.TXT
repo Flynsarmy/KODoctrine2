@@ -1,3 +1,6 @@
+1.09:
+- Bug fix for non-'default' database connections
+
 1.08:
 - Now works with and requires Doctrine 2.2
 

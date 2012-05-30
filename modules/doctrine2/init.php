@@ -47,8 +47,8 @@
 			if ( self::$_instance === null )
 				self::$_instance = new Doctrine();
 
-			return isset(self::$_instance->em[ $conn_name ])
-				? self::$_instance->em[ $conn_name ]
+			return isset(self::$_instance->_em[ $conn_name ])
+				? self::$_instance->_em[ $conn_name ]
 				: reset(self::$_instance->_em);
 		}
 
